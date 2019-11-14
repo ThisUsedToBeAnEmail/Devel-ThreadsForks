@@ -1,4 +1,5 @@
 require 5.008;
+use lib '.';
 use ExtUtils::MakeMaker;
 use Module::Metadata;
 eval "use Devel::Required";

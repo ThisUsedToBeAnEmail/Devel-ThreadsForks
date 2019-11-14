@@ -1,7 +1,4 @@
-BEGIN {				# Magic Perl CORE pragma
-    chdir 't' if -d 't';
-    unshift @INC,'../lib';
-}
+use lib '.';
 
 # get configuration information
 require Config;

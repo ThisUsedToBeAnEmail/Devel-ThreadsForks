@@ -13,13 +13,17 @@
 
 #     ABSTRACT => q[Check for availability of threads or forks]
 #     AUTHOR => [q[Elizabeth Mattijsen (liz@dijkmat.nl)]]
-#     BUILD_REQUIRES => {  }
-#     CONFIGURE_REQUIRES => {  }
+#     BUILD_REQUIRES => { Config=>q[0], Test::More=>q[0] }
+#     CONFIGURE_REQUIRES => { Devel::Required=>q[0], ExtUtils::MakeMaker=>q[0], Module::Metadata=>q[1.000033] }
 #     LICENSE => q[perl]
+#     META_ADD => { provides=>{ Devel::ThreadsForks=>{ file=>q[lib/Devel/ThreadsForks.pm], version=>q[0.07] } } }
+#     META_MERGE => { meta-spec=>{ version=>q[2] }, resources=>{ repository=>{ type=>q[git], url=>q[https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks.git], web=>q[https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks] } } }
 #     NAME => q[Devel::ThreadsForks]
-#     PREREQ_PM => {  }
+#     PREREQ_PM => { Config=>q[0], Test::More=>q[0], strict=>q[0], warnings=>q[0] }
 #     TEST_REQUIRES => {  }
 #     VERSION_FROM => q[lib/Devel/ThreadsForks.pm]
+#     clean => { FILES=>q[Devel-ThreadsForks-*] }
+#     dist => { COMPRESS=>q[gzip -9f], SUFFIX=>q[gz] }
 
 # --- MakeMaker post_initialize section:
 
@@ -166,6 +170,12 @@ H_FILES  =
 MAN1PODS = 
 MAN3PODS = lib/Devel/ThreadsForks.pm
 
+SDKROOT := $(shell xcrun --show-sdk-path)
+PERL_SYSROOT = $(SDKROOT)
+
+# Where is the Config information that we are using/depend on
+CONFIGDEP = $(PERL_ARCHLIBDEP)$(DFSEP)Config.pm $(PERL_SYSROOT)$(PERL_INCDEP)$(DFSEP)config.h
+
 # Where to build things
 INST_LIBDIR      = $(INST_LIB)/Devel
 INST_ARCHLIBDIR  = $(INST_ARCHLIB)/Devel
@@ -243,7 +253,7 @@ TAR = COPY_EXTENDED_ATTRIBUTES_DISABLE=1 COPYFILE_DISABLE=1 tar
 TARFLAGS = cvf
 ZIP = zip
 ZIPFLAGS = -r
-COMPRESS = gzip --best
+COMPRESS = gzip -9f
 SUFFIX = .gz
 SHAR = shar
 PREOP = $(NOECHO) $(NOOP)
@@ -456,7 +466,7 @@ clean :: clean_subdirs
 	  pm_to_blib.ts so_locations \
 	  tmon.out 
 	- $(RM_RF) \
-	  blib 
+	  Devel-ThreadsForks-* blib 
 	  $(NOECHO) $(RM_F) $(MAKEFILE_OLD)
 	- $(MV) $(FIRST_MAKEFILE) $(MAKEFILE_OLD) $(DEV_NULL)
 
@@ -484,11 +494,14 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) 'author:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  - '\''Elizabeth Mattijsen (liz@dijkmat.nl)'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'build_requires:' >> META_new.yml
-	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Config: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Test::More: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'configure_requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Devel::Required: '\''0'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) '  ExtUtils::MakeMaker: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Module::Metadata: '\''1.000033'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'dynamic_config: 1' >> META_new.yml
-	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'generated_by: '\''ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010'\''' >> META_new.yml
 	$(NOECHO) $(ECHO) 'license: perl' >> META_new.yml
 	$(NOECHO) $(ECHO) 'meta-spec:' >> META_new.yml
 	$(NOECHO) $(ECHO) '  url: http://module-build.sourceforge.net/META-spec-v1.4.html' >> META_new.yml
@@ -498,7 +511,18 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '  directory:' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - t' >> META_new.yml
 	$(NOECHO) $(ECHO) '    - inc' >> META_new.yml
+	$(NOECHO) $(ECHO) 'provides:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Devel::ThreadsForks:' >> META_new.yml
+	$(NOECHO) $(ECHO) '    file: lib/Devel/ThreadsForks.pm' >> META_new.yml
+	$(NOECHO) $(ECHO) '    version: '\''0.07'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'requires:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  Config: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  strict: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) '  warnings: '\''0'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'resources:' >> META_new.yml
+	$(NOECHO) $(ECHO) '  repository: https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks.git' >> META_new.yml
 	$(NOECHO) $(ECHO) 'version: '\''0.07'\''' >> META_new.yml
+	$(NOECHO) $(ECHO) 'x_serialization_backend: '\''CPAN::Meta::YAML version 0.011'\''' >> META_new.yml
 	-$(NOECHO) $(MV) META_new.yml $(DISTVNAME)/META.yml
 	$(NOECHO) $(ECHO) Generating META.json
 	$(NOECHO) $(ECHO) '{' > META_new.json
@@ -507,7 +531,7 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '      "Elizabeth Mattijsen (liz@dijkmat.nl)"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
 	$(NOECHO) $(ECHO) '   "dynamic_config" : 1,' >> META_new.json
-	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.143240",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "generated_by" : "ExtUtils::MakeMaker version 7.36, CPAN::Meta::Converter version 2.150010",' >> META_new.json
 	$(NOECHO) $(ECHO) '   "license" : [' >> META_new.json
 	$(NOECHO) $(ECHO) '      "perl_5"' >> META_new.json
 	$(NOECHO) $(ECHO) '   ],' >> META_new.json
@@ -525,17 +549,41 @@ metafile : create_distdir
 	$(NOECHO) $(ECHO) '   "prereqs" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '      "build" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Config" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Test::More" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      },' >> META_new.json
 	$(NOECHO) $(ECHO) '      "configure" : {' >> META_new.json
 	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
-	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0"' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Devel::Required" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "ExtUtils::MakeMaker" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Module::Metadata" : "1.000033"' >> META_new.json
+	$(NOECHO) $(ECHO) '         }' >> META_new.json
+	$(NOECHO) $(ECHO) '      },' >> META_new.json
+	$(NOECHO) $(ECHO) '      "runtime" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '         "requires" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '            "Config" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "strict" : "0",' >> META_new.json
+	$(NOECHO) $(ECHO) '            "warnings" : "0"' >> META_new.json
 	$(NOECHO) $(ECHO) '         }' >> META_new.json
 	$(NOECHO) $(ECHO) '      }' >> META_new.json
 	$(NOECHO) $(ECHO) '   },' >> META_new.json
+	$(NOECHO) $(ECHO) '   "provides" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '      "Devel::ThreadsForks" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '         "file" : "lib/Devel/ThreadsForks.pm",' >> META_new.json
+	$(NOECHO) $(ECHO) '         "version" : "0.07"' >> META_new.json
+	$(NOECHO) $(ECHO) '      }' >> META_new.json
+	$(NOECHO) $(ECHO) '   },' >> META_new.json
 	$(NOECHO) $(ECHO) '   "release_status" : "stable",' >> META_new.json
-	$(NOECHO) $(ECHO) '   "version" : "0.07"' >> META_new.json
+	$(NOECHO) $(ECHO) '   "resources" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '      "repository" : {' >> META_new.json
+	$(NOECHO) $(ECHO) '         "type" : "git",' >> META_new.json
+	$(NOECHO) $(ECHO) '         "url" : "https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks.git",' >> META_new.json
+	$(NOECHO) $(ECHO) '         "web" : "https://github.com/ThisUsedToBeAnEmail/Devel-ThreadsForks"' >> META_new.json
+	$(NOECHO) $(ECHO) '      }' >> META_new.json
+	$(NOECHO) $(ECHO) '   },' >> META_new.json
+	$(NOECHO) $(ECHO) '   "version" : "0.07",' >> META_new.json
+	$(NOECHO) $(ECHO) '   "x_serialization_backend" : "JSON::PP version 4.04"' >> META_new.json
 	$(NOECHO) $(ECHO) '}' >> META_new.json
 	-$(NOECHO) $(MV) META_new.json $(DISTVNAME)/META.json
 
@@ -848,6 +896,9 @@ ppd :
 	$(NOECHO) $(ECHO) '    <ABSTRACT>Check for availability of threads or forks</ABSTRACT>' >> Devel-ThreadsForks.ppd
 	$(NOECHO) $(ECHO) '    <AUTHOR>Elizabeth Mattijsen (liz@dijkmat.nl)</AUTHOR>' >> Devel-ThreadsForks.ppd
 	$(NOECHO) $(ECHO) '    <IMPLEMENTATION>' >> Devel-ThreadsForks.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="Config::" />' >> Devel-ThreadsForks.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="strict::" />' >> Devel-ThreadsForks.ppd
+	$(NOECHO) $(ECHO) '        <REQUIRE NAME="warnings::" />' >> Devel-ThreadsForks.ppd
 	$(NOECHO) $(ECHO) '        <ARCHITECTURE NAME="darwin-thread-multi-2level-5.18" />' >> Devel-ThreadsForks.ppd
 	$(NOECHO) $(ECHO) '        <CODEBASE HREF="" />' >> Devel-ThreadsForks.ppd
 	$(NOECHO) $(ECHO) '    </IMPLEMENTATION>' >> Devel-ThreadsForks.ppd
